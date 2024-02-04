@@ -3,7 +3,7 @@ import { Todo } from "@/types/Todo";
 import axios from "axios";
 
 export default async function Home() {
-  const response = await axios.get("http://localhost:3000/api/add");
+  const response = await axios.get(`http://${window.location.origin}/api/add`);
 
   const todo: Todo[] = response.data.data;
   console.log(todo);
