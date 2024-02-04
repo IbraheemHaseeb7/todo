@@ -24,6 +24,7 @@ export async function POST(req: Request) {
     }
 
     const file: File | any = data.get("file");
+    const filePath: string = path.join(__dirname, file.name);
 
     // SENDING 200 RESPONSE
     const response: ApiResponse = {
@@ -35,11 +36,11 @@ export async function POST(req: Request) {
       description: data.get("description")?.toString()!,
 
       // @ts-ignore
-      file: `/home/ibraheem/myWork/todo/todo/storage/uploads/${file.name}`,
+      file: filePath,
     });
 
     // @ts-ignore
-    await createFile(file);
+    await createFile(file, filePath);
 
     return Response.json(response, {
       status: 200,
@@ -58,12 +59,12 @@ export async function GET(req: Request) {
   return Response.json({ data: todo }, { status: 200 });
 }
 
-async function createFile(file: File) {
+async function createFile(file: File, filePath: string) {
   try {
     file.arrayBuffer().then(async (res) => {
       let buffer: Uint8Array = new Uint8Array(res);
 
-      await fs.writeFile(`./storage/uploads/${file.name}`, buffer);
+      await fs.writeFile(filePath, buffer);
     });
   } catch (error) {
     console.error("Error creating file:", error);
