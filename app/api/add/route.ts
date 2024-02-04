@@ -1,35 +1,71 @@
-import { ApiResponse } from "@/Types/ApiResponse";
+import { todo } from "@/storage/Todo";
+import { ApiResponse } from "@/types/ApiResponse";
+import fs from "fs/promises";
+import path from "path";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const data: FormData = await req.formData();
 
-    const isBody = JSON.stringify(body).length === 0;
+    const hasBody =
+      data.get("title")?.toString().length !== 0 &&
+      data.get("description")?.toString().length !== 0;
 
-    if (isBody) {
+    if (!hasBody) {
       // HANDLING ERROR FOR NO BODY PROVIDED
       const response: ApiResponse = {
-        code: 400,
         message: "Body not provided",
       };
 
-      return Response.json(response);
+      return Response.json(response, {
+        status: 400,
+        statusText: "Body not provided",
+      });
     }
 
-    console.log(body);
+    const file: File | any = data.get("file");
 
     // SENDING 200 RESPONSE
     const response: ApiResponse = {
-      code: 200,
       message: "New Item Added in Todo",
     };
-    return Response.json(response);
+
+    todo.push({
+      title: data.get("title")?.toString()!,
+      description: data.get("description")?.toString()!,
+
+      // @ts-ignore
+      file: `/home/ibraheem/myWork/todo/todo/storage/uploads/${file.name}`,
+    });
+
+    // @ts-ignore
+    await createFile(file);
+
+    return Response.json(response, {
+      status: 200,
+      statusText: "New Item added in Todo",
+    });
   } catch (e: any) {
     // SENDING 500 RESPONSE
     const response: ApiResponse = {
-      code: 500,
       message: e.message,
     };
-    return Response.json(response);
+    return Response.json(response, { status: 500, statusText: e.message });
+  }
+}
+
+export async function GET(req: Request) {
+  return Response.json({ data: todo }, { status: 200 });
+}
+
+async function createFile(file: File) {
+  try {
+    file.arrayBuffer().then(async (res) => {
+      let buffer: Uint8Array = new Uint8Array(res);
+
+      await fs.writeFile(`./storage/uploads/${file.name}`, buffer);
+    });
+  } catch (error) {
+    console.error("Error creating file:", error);
   }
 }

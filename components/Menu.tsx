@@ -16,7 +16,7 @@ export default function Menu() {
   ];
 
   return (
-    <div className="fixed top-0 left-0 w-[15%]">
+    <div className="w-[350px]">
       <div className="drawer lg:drawer-open">
         <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col items-center justify-center">
