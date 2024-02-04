@@ -3,7 +3,9 @@ import { Todo } from "@/types/Todo";
 import axios from "axios";
 
 export default async function Home() {
-  const response = await axios.get(`http://${window.location.origin}/api/add`);
+  const response = await axios.get(
+    `https://todo-ljcykv8ob-ibraheemhaseeb7.vercel.app/api/add`
+  );
 
   const todo: Todo[] = response.data.data;
   console.log(todo);
